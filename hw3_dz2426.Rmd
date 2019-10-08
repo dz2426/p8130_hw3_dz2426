@@ -69,7 +69,8 @@ pop_items_df =
   mutate(
     rank = dense_rank(desc(n)) #rank each product by each group
   ) %>% 
-  arrange(aisle, rank)
+  arrange(aisle, rank) %>% 
+  rename("ordered_times" = 3)
 
 pop_items_table = tibble(
   aisle = c(pull(pop_items_df, aisle)),
@@ -89,5 +90,46 @@ pop_items_table = tibble(
 Table 1: The three most popular products in each of the aisles
 ```{r echo = FALSE}
 knitr::kable(pop_items_table)
+knitr::kable(pop_items_df)
+```
+
+```{r echo = FALSE}
+pink_coffee_df = instacart %>% 
+  select(order_hour_of_day, order_dow, product_name) %>% #select the data we are interested in
+  filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% #filter out these two products
+  group_by(order_dow, product_name) %>% 
+  arrange(order_dow, order_hour_of_day) %>% 
+  mutate(
+    mean_order_hour = round(mean(order_hour_of_day) , digits = 0)
+  )
+
+pink_coffee_table = tibble(
+  mean_order_hour = c(pull(pink_coffee_df, mean_order_hour)),
+  order_day = c(pull(pink_coffee_df, order_dow)),
+  product_name = c(pull(pink_coffee_df, product_name)) #create variables we want
+) %>% 
+  distinct() %>% #remove dupplicated rows
+  mutate(
+    order_day = recode(order_day, 
+                       "0" = "Mon",
+                       "1" = "Tue",
+                       "2" = "Wed",
+                       "3" = "Thu",
+                       "4" = "Fri",
+                       "5" = "Sat",
+                       "6" = "Sun")
+  ) %>% #transform integer to name of each day
+  pivot_wider(
+    names_from = product_name,
+    values_from = mean_order_hour
+  ) %>% #2x7 table
+  janitor::clean_names() %>% 
+  rename(pink_lady_apples_order_hr = 2) %>% 
+  rename(coffee_ice_cream_order_hr = 3) #clean up names
+  
+```
+Table 2: mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week
+```{r echo = FALSE}
+knitr::kable(pink_coffee_table)
 ```
 
