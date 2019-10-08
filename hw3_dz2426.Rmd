@@ -7,24 +7,38 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(p8105.datasets)
+library(tidyverse)
+library(viridis)
+knitr::opts_chunk$set(
+	echo = TRUE,
+	warning = FALSE,
+	fig.width = 8, 
+  fig.height = 6,
+  out.width = "90%"
+)
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
-## R Markdown
+## Problem 1
+```{r}
+# Import data set "instacart"
+instacart_data_q1 = instacart %>% 
+  janitor::clean_names() %>%
+  count(aisle) %>% #count the number of items in each group of aisle
+  arrange(desc(n)) #sort in descending order
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+# Show the range of aisles
+range(pull(instacart, aisle_id)) 
 ```
+Comments:
 
-## Including Plots
+There are `r range(pull(instacart, aisle_id))[2]` aisles in total and the aisle "fresh vegetables" has the most items.
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
