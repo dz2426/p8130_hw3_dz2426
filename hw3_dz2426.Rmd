@@ -3,42 +3,58 @@ title: "hw3_dz2426"
 author: "Duzhi Zhao"
 date: "10/7/2019"
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-library(p8105.datasets)
 library(tidyverse)
+library(ggridges)
 library(viridis)
-knitr::opts_chunk$set(
-	echo = TRUE,
-	warning = FALSE,
-	fig.width = 8, 
-  fig.height = 6,
-  out.width = "90%"
-)
-options(
-  ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis"
-)
-scale_colour_discrete = scale_colour_viridis_d
-scale_fill_discrete = scale_fill_viridis_d
-theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
 ## Problem 1
+# Section 1.1
 ```{r}
 # Import data set "instacart"
+library(p8105.datasets)
+data("instacart")
+
 instacart_data_q1 = instacart %>% 
   janitor::clean_names() %>%
   count(aisle) %>% #count the number of items in each group of aisle
-  arrange(desc(n)) #sort in descending order
-
-# Show the range of aisles
-range(pull(instacart, aisle_id)) 
+  arrange(desc(n))  #sort in descending order
+  
 ```
 Comments:
 
-There are `r range(pull(instacart, aisle_id))[2]` aisles in total and the aisle "fresh vegetables" has the most items.
+There are `r range(pull(instacart, aisle_id))[2]` aisles in total and the aisle "fresh vegetables" has the most items ordered from.
+
+# Section 1.2
+```{r}
+items_order_df = instacart %>% 
+  janitor::clean_names() %>% 
+  count(aisle_id, aisle) %>% #count the number of items in each group of aisle
+  filter(n > 10000) %>% #filter items ordered > 10000
+  arrange(aisle_id) %>% #sort items ordered in descending order 
+  rename(count = n)
+  
+ggplot(items_order_df) +
+  geom_col(aes(x = aisle_id, y = count, fill = aisle), position = "dodge") +
+  labs(
+    title = "Number of items ordered in each aisle",
+    x = "aisle id",
+    y = "Number of items ordered",
+    caption = "Data from 'The Instacart Online Grocery Shopping Dataset 2017'"
+  ) + 
+  viridis::scale_color_viridis(
+    name = "aisle", 
+    discrete = TRUE
+    ) +
+  theme(legend.position = "bottom")
+
+
+```
 
