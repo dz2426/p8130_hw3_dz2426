@@ -72,7 +72,7 @@ items_order_plot =
   geom_col() + #show bar graph
   coord_flip() + #xy axis flip 
   labs(
-    title = "Number of items ordered in each aisle (>10000)"
+    title = "Figure 1: Number of items ordered in each aisle (>10000)"
   ) +
   ylim(0, 170000) 
 items_order_plot
@@ -209,7 +209,7 @@ excellent_resp %>%
   geom_line() +
   xlab("Year") +
   ylab("Average value") +
-  ggtitle("Figure 1a: Average value within each state from 2002 to 2010")
+  ggtitle("Figure 2a: Average value within each state from 2002 to 2010")
 ```
  
 ```{r echo = FALSE}
@@ -220,14 +220,33 @@ excellent_resp %>%
   facet_wrap(~state, nrow = 4) + 
   xlab("Year") +
   ylab("Average value") +
-  ggtitle("Figure 1b: Figure 1a shown with separate plots based on states") +
+  ggtitle("Figure 2b: Figure 2a shown with separate plots based on states") +
   theme(axis.text.x = element_text(size = 5),
         axis.text.y = element_text(size = 8),
         axis.title = element_text(size = 15),
         strip.text = element_text(size = 10),
-        title = element_text(size = 15),
+        title = element_text(size = 13),
         panel.spacing.x = unit(1, "lines")
   )
 ```
 
+# Section 2.3 
+Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
+
+```{r echo = FALSE}
+NY_response = 
+  brfss2010 %>% 
+  select(year, state, county, data_value, response) %>% 
+  filter(year == 2006 | year == 2010,
+         state %in% c("NY"))
+
+NY_response %>% 
+  ggplot(aes(x = response, y = data_value, fill = county)) + 
+  geom_col(position = "dodge") +
+  facet_grid(~year) + 
+  ylab("data value") +
+  ggtitle("Figure 3: Distribution of data value for responses (“Poor” to “Excellent”) in NY") + 
+  theme(title = element_text(size = 10))
+  
+```
 
