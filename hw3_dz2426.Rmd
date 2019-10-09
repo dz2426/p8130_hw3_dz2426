@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
   message = FALSE,
-  fig.width = 8, 
-  fig.height = 6,
+  fig.width = 12, 
+  fig.height = 10,
   out.width = "100%"
 )
 options(
@@ -220,12 +220,12 @@ excellent_resp %>%
   facet_wrap(~state, nrow = 4) + 
   xlab("Year") +
   ylab("Average value") +
-  ggtitle("Figure 1b: Figure 1a shown with separated states") +
-  theme(axis.text.x = element_text(size = 4),
+  ggtitle("Figure 1b: Figure 1a shown with separate plots based on states") +
+  theme(axis.text.x = element_text(size = 5),
         axis.text.y = element_text(size = 8),
         axis.title = element_text(size = 15),
         strip.text = element_text(size = 10),
-        title = element_text(size = 18),
+        title = element_text(size = 15),
         panel.spacing.x = unit(1, "lines")
   )
 ```
