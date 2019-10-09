@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,
   message = FALSE,
-  fig.width = 16, 
-  fig.height = 8,
+  fig.width = 8, 
+  fig.height = 6,
   out.width = "100%"
 )
 options(
@@ -42,7 +42,9 @@ Comments:
 
 write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations
 
-This limited "Instacart" dataset contains 1,384,617 observations of 131,209 unique users, and 15 columns of variables. Here are some key variables, such as "aisle" which includes 134 aisles, "department" which includes 21 departments, "product_name" which includes 39123 different products, "reordered" showing whether the item has been ordered by this user in the past, and "order_dow" indicating the day of the week on which the order is placed.
+This limited "Instacart" dataset contains 1,384,617 observations of 131,209 unique users, and 15 columns of variables. Some key variables are "aisle"  "department", "product_name", "reordered" showing whether the item has been ordered by this user in the past, and "order_dow" indicating the day of the week on which the order is placed.
+
+"Aisle" has 134 groups, such as yogurt, fresh vegetables, and fresh fruits. "Product_name" includes 39123 products, such as Bulgarian Yogurt, Organic Celery Hearts, and Bag of Organic Bananas. "Department" includes 21 departments, such as dairy eggs, produce, canned goods.
 
 # Section 1.1
 ```{r echo = FALSE}
@@ -72,14 +74,7 @@ items_order_plot =
   labs(
     title = "Number of items ordered in each aisle (>10000)"
   ) +
-  ylim(0, 170000) +
-  theme(axis.text = element_text(size = 15),
-        axis.text.x = element_text(size = 15),
-        axis.text.y = element_text(size = 12),
-        axis.title = element_text(size = 20),
-        title = element_text(size = 20)
-  )
-
+  ylim(0, 170000) 
 items_order_plot
 ```
 
@@ -96,26 +91,13 @@ pop_items_df =
     rank = dense_rank(desc(n)) #rank each product by each group
   ) %>% 
   arrange(aisle, rank) %>% 
-  rename("ordered_times" = 3)
-
-pop_items_table = tibble(
-  aisle = c(pull(pop_items_df, aisle)),
-  product_name = c(pull(pop_items_df, product_name)),
-  rank = c(pull(pop_items_df, rank))
-) %>% 
-  pivot_wider(
-    names_from = rank,
-    values_from = product_name,
-  ) %>% 
-  rename("rank #1" = 2, 
-         "rank #2" = 3, 
-         "rank #3" = 4)
+  rename("ordered_times" = 3) %>% 
+  select(-rank)
 
 ```
 
 Table 1: The three most popular products in each of the aisles
 ```{r echo = FALSE}
-knitr::kable(pop_items_table)
 knitr::kable(pop_items_df)
 ```
 
@@ -212,30 +194,40 @@ excellent_resp =
   group_by(year, state) %>% 
   select(year, state, response, data_value) %>% 
   filter(response == "Excellent")  %>% 
+  drop_na() %>% #remove NA 
   mutate(
     mean_data_val = round(mean(data_value), digits = 2) #mean of data_value grouped by year and state
   ) %>% 
   select(-data_value,
          -response) %>% 
-  drop_na() %>% #remove NA 
   distinct() #remove duplicated rows
 ```
 
 ```{r echo = FALSE}
 excellent_resp %>% 
+  ggplot(aes(x = year, y = mean_data_val, color = state)) +
+  geom_line() +
+  xlab("Year") +
+  ylab("Average value") +
+  ggtitle("Figure 1a: Average value within each state from 2002 to 2010")
+```
+ 
+```{r echo = FALSE}
+excellent_resp %>% 
   ggplot(aes(x = year, y = mean_data_val, group = state)) +
-  geom_point(size = 2) +
+  geom_point(size = 1) +
   geom_line() +
   facet_wrap(~state, nrow = 4) + 
   xlab("Year") +
   ylab("Average value") +
-  ggtitle("Average value within each state from 2002 to 2010") +
-  theme(axis.text.x = element_text(size = 6),
-        axis.text.y = element_text(size = 10),
-        axis.title = element_text(size = 18),
-        strip.text = element_text(size = 15),
-        title = element_text(size = 22),
+  ggtitle("Figure 1b: Figure 1a shown with separated states") +
+  theme(axis.text.x = element_text(size = 4),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 15),
+        strip.text = element_text(size = 10),
+        title = element_text(size = 18),
         panel.spacing.x = unit(1, "lines")
   )
 ```
+
 
