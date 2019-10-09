@@ -13,12 +13,12 @@ library(viridis)
 library(leaflet)
 
 knitr::opts_chunk$set(
-	echo = TRUE,
-	warning = FALSE,
-	message = FALSE,
-	fig.width = 8, 
-  fig.height = 6,
-  out.width = "90%"
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 16, 
+  fig.height = 8,
+  out.width = "100%"
 )
 options(
   ggplot2.continuous.colour = "viridis",
@@ -71,8 +71,14 @@ items_order_plot =
   coord_flip() + #xy axis flip 
   labs(
     title = "Number of items ordered in each aisle (>10000)"
+  ) +
+  ylim(0, 170000) +
+  theme(axis.text = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 20),
+        title = element_text(size = 20)
   )
-  ylim(0, 175000)
 
 items_order_plot
 ```
@@ -104,7 +110,7 @@ pop_items_table = tibble(
   rename("rank #1" = 2, 
          "rank #2" = 3, 
          "rank #3" = 4)
-  
+
 ```
 
 Table 1: The three most popular products in each of the aisles
@@ -146,7 +152,7 @@ pink_coffee_table = tibble(
   janitor::clean_names() %>% 
   rename(pink_lady_apples_order_hr = 2) %>% 
   rename(coffee_ice_cream_order_hr = 3) #clean up names
-  
+
 ```
 
 # Section 1.4
@@ -157,23 +163,78 @@ knitr::kable(pink_coffee_table)
 
 ## Problem 2
 ```{r echo = FALSE}
-#Import data set
+#Import and clean data set
 data("brfss_smart2010")
 
 brfss2010 = brfss_smart2010 %>% 
   janitor::clean_names() %>% 
-  rename(location = locationabbr) %>%  #rename variables
-  rename(county = locationdesc) %>% 
-  rename(health_class = class) %>% 
-  rename(response_id = respid) %>% 
-  filter(topic == "Overall Health") %>% #filter the topic
-  filter(response != "Very good") %>% #filter out the response
+  rename(state = locationabbr,  #rename variables
+         county = locationdesc,
+         health_class = class,
+         response_id = respid) %>% 
+  filter(topic == "Overall Health", 
+         response != "Very good") %>% #filter the topic and filter out the response
   mutate(
     response = as.factor(response) #change type to factor
   ) %>% 
   arrange(desc(response)) #arrange from poor to excellent in descending order
-  
-  
-  
+```
+
+# Section 2.1
+```{r echo = FALSE}
+locations2002_df = 
+  brfss2010 %>% 
+  filter(year == 2002) %>% 
+  count(state) %>% 
+  mutate(
+    n_of_locations = n/4 #After observing dataset, I notice there are 4 responses for each location. Thus, the number of each distinct locations equals the total number of observations divded by 4
+  ) %>% 
+  filter(n_of_locations > 6) 
+
+locations2010_df = 
+  brfss2010 %>% 
+  filter(year == 2010) %>% 
+  count(state) %>% 
+  mutate(
+    n_of_locations = n/4 
+  ) %>% 
+  filter(n_of_locations > 6) 
+```
+Comments:
+
+In 2002, `r c(pull(locations2002_df, state))` were observed at 7 or more locations. In 2010, `r c(pull(locations2010_df, state))` were observed at 7 or more locations.
+
+# Section 2.2
+```{r echo = FALSE}
+# Construct dataset limited to "Excellent" response
+excellent_resp = 
+  brfss2010 %>% 
+  group_by(year, state) %>% 
+  select(year, state, response, data_value) %>% 
+  filter(response == "Excellent")  %>% 
+  mutate(
+    mean_data_val = round(mean(data_value), digits = 2) #mean of data_value grouped by year and state
+  ) %>% 
+  select(-data_value,
+         -response) %>% 
+  drop_na() %>% #remove NA 
+  distinct() #remove duplicated rows
+```
+
+```{r echo = FALSE}
+excellent_resp %>% 
+  ggplot(aes(x = year, y = mean_data_val, group = state)) +
+  geom_point(size = 2) +
+  geom_line() +
+  facet_wrap(~state, nrow = 4) + 
+  xlab("Year") +
+  ylab("Average value") +
+  ggtitle("Average value within each state from 2002 to 2010") +
+  theme(axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 10),
+        axis.title = element_text(size = 18),
+        strip.text = element_text(size = 15),
+        title = element_text(size = 22)
+  )
 ```
 
