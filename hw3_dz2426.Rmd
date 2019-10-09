@@ -234,7 +234,8 @@ excellent_resp %>%
         axis.text.y = element_text(size = 10),
         axis.title = element_text(size = 18),
         strip.text = element_text(size = 15),
-        title = element_text(size = 22)
+        title = element_text(size = 22),
+        panel.spacing.x = unit(1, "lines")
   )
 ```
 
