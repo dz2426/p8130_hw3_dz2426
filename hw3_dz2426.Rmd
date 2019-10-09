@@ -11,6 +11,7 @@ editor_options:
 library(tidyverse)
 library(viridis)
 library(leaflet)
+
 knitr::opts_chunk$set(
 	echo = TRUE,
 	warning = FALSE,
@@ -29,17 +30,26 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
 ## Problem 1
-# Section 1.1
-```{r echo = FALSE}
+# Description of "Instacart" dataset
+```{r include = FALSE}
 # Import data set "instacart"
 library(p8105.datasets)
 data("instacart")
 
-instacart_data_q1 = instacart %>% 
-  janitor::clean_names() %>%
-  count(aisle) %>% #count the number of items in each group of aisle
-  arrange(desc(n))  #sort in descending order
+skimr::skim(instacart) # Summary statistics
+```
+Comments:
 
+write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations
+
+This limited "Instacart" dataset contains 1,384,617 observations of 131,209 unique users, and 15 columns of variables. Here are some key variables, such as "aisle" which includes 134 aisles, "department" which includes 21 departments, "product_name" which includes 39123 different products, "reordered" showing whether the item has been ordered by this user in the past, and "order_dow" indicating the day of the week on which the order is placed.
+
+# Section 1.1
+```{r echo = FALSE}
+instacart_data_q1 = instacart %>% 
+  janitor::clean_names() %>% 
+  count(aisle) %>% #count the number of items ordered from each aisle
+  arrange(desc(n)) #sort in descending order
 ```
 Comments:
 
@@ -138,8 +148,32 @@ pink_coffee_table = tibble(
   rename(coffee_ice_cream_order_hr = 3) #clean up names
   
 ```
+
+# Section 1.4
 Table 2: mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week
 ```{r echo = FALSE}
 knitr::kable(pink_coffee_table)
+```
+
+## Problem 2
+```{r echo = FALSE}
+#Import data set
+data("brfss_smart2010")
+
+brfss2010 = brfss_smart2010 %>% 
+  janitor::clean_names() %>% 
+  rename(location = locationabbr) %>%  #rename variables
+  rename(county = locationdesc) %>% 
+  rename(health_class = class) %>% 
+  rename(response_id = respid) %>% 
+  filter(topic == "Overall Health") %>% #filter the topic
+  filter(response != "Very good") %>% #filter out the response
+  mutate(
+    response = as.factor(response) #change type to factor
+  ) %>% 
+  arrange(desc(response)) #arrange from poor to excellent in descending order
+  
+  
+  
 ```
 
