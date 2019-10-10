@@ -235,7 +235,7 @@ NY_response =
   brfss2010 %>% 
   select(year, state, county, data_value, response) %>% 
   filter(year == 2006 | year == 2010,
-         state %in% c("NY")) %>% 
+         state %in% c("NY")) #Select data
 
 NY_response %>% 
   ggplot(aes(x = response, y = data_value, fill = county)) + 
@@ -249,24 +249,45 @@ NY_response %>%
 ```
 
 ## Problem 3
+# Section 3.1
 ```{r echo = FALSE}
 # Import dataset
 accel_data = read_csv("./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
+      day = ordered(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), #change day into factor and reorder in a classical Mon-Sun way
       if_weekday = ifelse(
-      day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") == TRUE, 1, 0) 
+      day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") == TRUE, "weekday", "weekend") #determine if it is a weekday
   ) %>% 
   subset(select = c(1, 2, 3, 1444, 4:1443)) #reorder columns
   
 ```
 Comments: 
-Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
 
-The tidied "accel_data" dataset contains `r dim(accel_data)[1]` observations and `r dim(accel_data)[2]` variables. Variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Variable "day" refers to the day the accelerometer was monitoring on. Variable "if_weekday" determines if the day is a weekday (1) or weeekend (0). The rest of the "activity" columns represent the activity counts for each minute of a 24-hour day starting at midnight. A total of 1440 minutes of activity data was included.
+The tidied "accel_data" dataset contains `r dim(accel_data)[1]` observations and `r dim(accel_data)[2]` variables. Variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Variable "day" refers to the day the accelerometer was monitoring on. Variable "if_weekday" determines if the day is a weekday or weeekend. The rest of the "activity" columns represent the activity counts for each minute of a 24-hour day starting at midnight. A total of 1440 minutes of activity data was included.
 
 Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
-```{r}
 
+# Section 3.2
+```{r echo = FALSE}
+accel_total = accel_data %>% 
+  mutate(
+    total_activity = select(., activity_1:activity_1440) %>% 
+      rowSums(na.rm = TRUE) %>% #select activity columns and sum all columns on each row
+      round(digits = 0) #round to the nearest integer
+  ) %>% 
+  select(week, day, total_activity) %>%  #remove all minutely activity columns
+  arrange(day) %>% 
+  pivot_wider(
+    names_from = day,
+    values_from = total_activity
+  )
+```
+Comments:
+
+Table 3: Total activity in minutes for each day over 5 weeks
+```{r echo = FALSE}
+knitr::kable(accel_total)
 ```
 
+# Section 3.3
