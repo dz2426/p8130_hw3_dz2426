@@ -40,11 +40,9 @@ skimr::skim(instacart) # Summary statistics
 ```
 Comments:
 
-write a short description of the dataset, noting the size and structure of the data, describing some key variables, and giving illstrative examples of observations
+This limited "Instacart" dataset contains 1,384,617 observations of 131,209 unique users, and 15 columns of variables. Some key variables are "aisle"  "department", "product_name", "reordered", and "order_dow".
 
-This limited "Instacart" dataset contains 1,384,617 observations of 131,209 unique users, and 15 columns of variables. Some key variables are "aisle"  "department", "product_name", "reordered" showing whether the item has been ordered by this user in the past, and "order_dow" indicating the day of the week on which the order is placed.
-
-"Aisle" has 134 groups, such as yogurt, fresh vegetables, and fresh fruits. "Product_name" includes 39123 products, such as Bulgarian Yogurt, Organic Celery Hearts, and Bag of Organic Bananas. "Department" includes 21 departments, such as dairy eggs, produce, canned goods.
+"aisle" contains 134 groups, such as yogurt, fresh vegetables, and fresh fruits. "product_name" includes 39123 products, such as Bulgarian Yogurt, Organic Celery Hearts, and Bag of Organic Bananas. "department" includes 21 departments, such as dairy eggs, produce, canned goods. "reordered" shows whether the item has been ordered by this user in the past. "order_dow" indicates the day of the week on which the order is placed
 
 # Section 1.1
 ```{r echo = FALSE}
@@ -231,14 +229,13 @@ excellent_resp %>%
 ```
 
 # Section 2.3 
-Make a two-panel plot showing, for the years 2006, and 2010, distribution of data_value for responses (“Poor” to “Excellent”) among locations in NY State.
 
 ```{r echo = FALSE}
 NY_response = 
   brfss2010 %>% 
   select(year, state, county, data_value, response) %>% 
   filter(year == 2006 | year == 2010,
-         state %in% c("NY"))
+         state %in% c("NY")) %>% 
 
 NY_response %>% 
   ggplot(aes(x = response, y = data_value, fill = county)) + 
@@ -246,7 +243,30 @@ NY_response %>%
   facet_grid(~year) + 
   ylab("data value") +
   ggtitle("Figure 3: Distribution of data value for responses (“Poor” to “Excellent”) in NY") + 
-  theme(title = element_text(size = 10))
+  theme(title = element_text(size = 12),
+        axis.title = element_text(size = 10))
   
+```
+
+## Problem 3
+```{r echo = FALSE}
+# Import dataset
+accel_data = read_csv("./data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+      if_weekday = ifelse(
+      day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") == TRUE, 1, 0) 
+  ) %>% 
+  subset(select = c(1, 2, 3, 1444, 4:1443)) #reorder columns
+  
+```
+Comments: 
+Describe the resulting dataset (e.g. what variables exist, how many observations, etc).
+
+The tidied "accel_data" dataset contains `r dim(accel_data)[1]` observations and `r dim(accel_data)[2]` variables. Variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Variable "day" refers to the day the accelerometer was monitoring on. Variable "if_weekday" determines if the day is a weekday (1) or weeekend (0). The rest of the "activity" columns represent the activity counts for each minute of a 24-hour day starting at midnight. A total of 1440 minutes of activity data was included.
+
+Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
+```{r}
+
 ```
 
