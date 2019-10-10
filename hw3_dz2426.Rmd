@@ -266,8 +266,6 @@ Comments:
 
 The tidied "accel_data" dataset contains `r dim(accel_data)[1]` observations and `r dim(accel_data)[2]` variables. Variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Variable "day" refers to the day the accelerometer was monitoring on. Variable "if_weekday" determines if the day is a weekday or weeekend. The rest of the "activity" columns represent the activity counts for each minute of a 24-hour day starting at midnight. A total of 1440 minutes of activity data was included.
 
-Traditional analyses of accelerometer data focus on the total activity over the day. Using your tidied dataset, aggregate accross minutes to create a total activity variable for each day, and create a table showing these totals. Are any trends apparent?
-
 # Section 3.2
 ```{r echo = FALSE}
 accel_total = accel_data %>% 
