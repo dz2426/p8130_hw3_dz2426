@@ -154,7 +154,7 @@ brfss2010 = brfss_smart2010 %>%
          response_id = respid) %>% 
   filter(topic == "Overall Health", 
          response %in% c("Poor", "Good", "Fair", "Very good", "Excellent")
-         ) %>% #filter the topic and filter out the response
+  ) %>% #filter the topic and filter out the response
   mutate(
     response = ordered(response, levels = c("Poor", "Fair", "Good", "Very good", "Excellent"))
   ) %>% 
@@ -210,7 +210,7 @@ excellent_resp %>%
   ylab("Average value") +
   ggtitle("Figure 2a: Average value within each state from 2002 to 2010")
 ```
- 
+
 ```{r echo = FALSE}
 excellent_resp %>% 
   ggplot(aes(x = year, y = mean_data_val, group = state)) +
@@ -247,30 +247,52 @@ NY_response %>%
   theme(title = element_text(size = 12),
         axis.title = element_text(size = 10),
         strip.text = element_text(size = 10))
-  
+
 ```
 
 ## Problem 3
 # Section 3.1
 ```{r echo = FALSE}
 # Import dataset
-accel_data = read_csv("./data/accel_data.csv") %>% 
+accel_data_act = read_csv("./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
-      day = ordered(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), #change day into factor and reorder in a classical Mon-Sun way
-      if_weekday = ifelse(
+    day = ordered(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), #change day into factor and reorder in a classical Mon-Sun way
+    if_weekday = ifelse(
       day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") == TRUE, "weekday", "weekend") #determine if it is a weekday
   ) %>% 
   subset(select = c(1, 2, 3, 1444, 4:1443)) #reorder columns
-  
+
 ```
+
+```{r}
+accel_data_min = read_csv("./data/accel_data.csv") %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    day = ordered(day, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), #change day into factor and reorder in a classical Mon-Sun way
+    if_weekday = ifelse(
+      day %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday") == TRUE, "weekday", "weekend") #determine if it is a weekday
+  ) %>% 
+  arrange(week, day) %>% 
+  pivot_longer(
+    activity_1:activity_1440,
+    names_to = "minute", 
+    names_prefix = "activity_",
+    values_to = "activity_count"
+  ) %>% 
+  mutate(
+    minute = as.numeric(minute) #change from character to numeric
+  )
+```
+
+
 Comments: 
 
 The tidied "accel_data" dataset contains `r dim(accel_data)[1]` observations and `r dim(accel_data)[2]` variables. Variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Variable "day" refers to the day the accelerometer was monitoring on. Variable "if_weekday" determines if the day is a weekday or weeekend. The rest of the "activity" columns represent the activity counts for each minute of a 24-hour day starting at midnight. A total of 1440 minutes of activity data was included.
 
 # Section 3.2
 ```{r echo = FALSE}
-accel_total = accel_data %>% 
+accel_total = accel_data_act %>% 
   mutate(
     total_activity = select(., activity_1:activity_1440) %>% 
       rowSums(na.rm = TRUE) %>% #select activity columns and sum all columns on each row
@@ -288,18 +310,68 @@ Table 3: Total activity in minutes for each day over 5 weeks
 ```{r echo = FALSE}
 knitr::kable(accel_total)
 ```
-Comments:
 
 # Section 3.3
 ```{r echo = FALSE}
-accel_24h_course = accel_data %>% 
-  mutate(activity_hr1 = select(., activity_1:activity_60) %>% 
+accel_time_course = accel_data_act %>% 
+  mutate(
+    "1" = select(., activity_1:activity_60) %>% 
       rowSums(na.rm = TRUE),
-      activity_hr2 = select?
-        ?????
-    
+    "2" = select(., activity_61:activity_120) %>% 
+      rowSums(na.rm = TRUE),
+    "3" = select(., activity_121:activity_180) %>% 
+      rowSums(na.rm = TRUE),
+    "4" = select(., activity_181:activity_240) %>% 
+      rowSums(na.rm = TRUE),
+    "5" = select(., activity_241:activity_300) %>% 
+      rowSums(na.rm = TRUE),
+    "6" = select(., activity_301:activity_360) %>% 
+      rowSums(na.rm = TRUE),
+    "7" = select(., activity_361:activity_420) %>% 
+      rowSums(na.rm = TRUE),
+    "8" = select(., activity_421:activity_480) %>% 
+      rowSums(na.rm = TRUE),
+    "9" = select(., activity_481:activity_540) %>% 
+      rowSums(na.rm = TRUE),
+    "10" = select(., activity_541:activity_600) %>% 
+      rowSums(na.rm = TRUE),
+    "11" = select(., activity_601:activity_660) %>% 
+      rowSums(na.rm = TRUE),
+    "12" = select(., activity_661:activity_720) %>% 
+      rowSums(na.rm = TRUE),
+    "13" = select(., activity_721:activity_780) %>% 
+      rowSums(na.rm = TRUE),
+    "14" = select(., activity_781:activity_840) %>% 
+      rowSums(na.rm = TRUE),
+    "15" = select(., activity_841:activity_900) %>% 
+      rowSums(na.rm = TRUE),
+    "16" = select(., activity_901:activity_960) %>% 
+      rowSums(na.rm = TRUE),
+    "17" = select(., activity_961:activity_1020) %>% 
+      rowSums(na.rm = TRUE),
+    "18" = select(., activity_1021:activity_1080) %>% 
+      rowSums(na.rm = TRUE),
+    "19" = select(., activity_1081:activity_1140) %>% 
+      rowSums(na.rm = TRUE),
+    "20" = select(., activity_1141:activity_1200) %>% 
+      rowSums(na.rm = TRUE),
+    "21" = select(., activity_1201:activity_1260) %>% 
+      rowSums(na.rm = TRUE),
+    "22" = select(., activity_1261:activity_1320) %>% 
+      rowSums(na.rm = TRUE),
+    "23" = select(., activity_1321:activity_1380) %>% 
+      rowSums(na.rm = TRUE),
+    "24" = select(., activity_1381:activity_1440) %>% 
+      rowSums(na.rm = TRUE)
+  ) %>% 
+  subset(select = c(1, 3, 1445:1468)) %>%
+  arrange(week, day) %>% 
+  pivot_longer(
+    3:26,
+    names_to = "Time_of_day_hr",
+    values_to = "activity_count"
   )
-  
+
 # map
 ```
 
