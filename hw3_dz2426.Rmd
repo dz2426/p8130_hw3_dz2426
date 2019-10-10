@@ -308,7 +308,7 @@ accel_total = accel_data_act %>%
   )
 ```
 
-Table 3: Total activity measured in minutes for the 63 year-old male with BMI 25 on each day over 5 weeks
+Table 3: Total activity measured in minutes of a 63 year-old male with BMI 25 on each day over 5 weeks
 ```{r echo = FALSE}
 knitr::kable(accel_total)
 ```
@@ -398,7 +398,7 @@ ggplot(accel_time_course, aes(x = time_of_day_hr, y = activity_count)) +
   geom_line(data = accel_week5, aes(colour = day)) +
   xlab("Time of day (hour)") + 
   ylab("Activity counts") +
-  ggtitle("Figure 4a: Physical activity of the 63 year-old male with BMI 25 over 5 weeks") +
+  ggtitle("Figure 4a: Physical activity of a 63 year-old male with BMI 25 over 5 weeks") +
   theme(title = element_text(size = 13),
         axis.title = element_text(size = 14),
         strip.text = element_text(size = 12),
