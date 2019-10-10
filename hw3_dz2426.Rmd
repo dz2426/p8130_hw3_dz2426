@@ -136,7 +136,7 @@ pink_coffee_table = tibble(
 ```
 
 # Section 1.4
-Table 2: mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week
+Table 2: Mean hour of the day at which Pink Lady Apples and Coffee Ice Cream are ordered on each day of the week
 ```{r echo = FALSE}
 knitr::kable(pink_coffee_table)
 ```
@@ -153,11 +153,12 @@ brfss2010 = brfss_smart2010 %>%
          health_class = class,
          response_id = respid) %>% 
   filter(topic == "Overall Health", 
-         response != "Very good") %>% #filter the topic and filter out the response
+         response %in% c("Poor", "Good", "Fair", "Very good", "Excellent")
+         ) %>% #filter the topic and filter out the response
   mutate(
-    response = as.factor(response) #change type to factor
+    response = ordered(response, levels = c("Poor", "Fair", "Good", "Very good", "Excellent"))
   ) %>% 
-  arrange(desc(response)) #arrange from poor to excellent in descending order
+  arrange(response) #arrange from poor to excellent in descending order
 ```
 
 # Section 2.1
@@ -238,13 +239,14 @@ NY_response =
          state %in% c("NY")) #Select data
 
 NY_response %>% 
-  ggplot(aes(x = response, y = data_value, fill = county)) + 
-  geom_col(position = "dodge") +
+  ggplot(aes(x = response, y = data_value)) + 
+  geom_boxplot() +
   facet_grid(~year) + 
   ylab("data value") +
   ggtitle("Figure 3: Distribution of data value for responses (“Poor” to “Excellent”) in NY") + 
   theme(title = element_text(size = 12),
-        axis.title = element_text(size = 10))
+        axis.title = element_text(size = 10),
+        strip.text = element_text(size = 10))
   
 ```
 
@@ -281,11 +283,23 @@ accel_total = accel_data %>%
     values_from = total_activity
   )
 ```
-Comments:
 
 Table 3: Total activity in minutes for each day over 5 weeks
 ```{r echo = FALSE}
 knitr::kable(accel_total)
 ```
+Comments:
 
 # Section 3.3
+```{r echo = FALSE}
+accel_24h_course = accel_data %>% 
+  mutate(activity_hr1 = select(., activity_1:activity_60) %>% 
+      rowSums(na.rm = TRUE),
+      activity_hr2 = select?
+        ?????
+    
+  )
+  
+# map
+```
+
