@@ -230,7 +230,6 @@ excellent_resp %>%
 ```
 
 # Section 2.3 
-
 ```{r echo = FALSE}
 NY_response = 
   brfss2010 %>% 
@@ -244,9 +243,12 @@ NY_response %>%
   facet_grid(~year) + 
   ylab("data value") +
   ggtitle("Figure 3: Distribution of data value for responses (“Poor” to “Excellent”) in NY") + 
-  theme(title = element_text(size = 12),
-        axis.title = element_text(size = 10),
-        strip.text = element_text(size = 10))
+  theme(title = element_text(size = 13),
+        axis.title = element_text(size = 14),
+        strip.text = element_text(size = 14),
+        axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8)
+        )
 
 ```
 
@@ -265,7 +267,7 @@ accel_data_act = read_csv("./data/accel_data.csv") %>%
 
 ```
 
-```{r}
+```{r echo = FALSE}
 accel_data_min = read_csv("./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
@@ -278,17 +280,17 @@ accel_data_min = read_csv("./data/accel_data.csv") %>%
     activity_1:activity_1440,
     names_to = "minute", 
     names_prefix = "activity_",
-    values_to = "activity_count"
+    values_to = "activity_counts"
   ) %>% 
   mutate(
     minute = as.numeric(minute) #change from character to numeric
   )
 ```
-
-
 Comments: 
 
-The tidied "accel_data" dataset contains `r dim(accel_data)[1]` observations and `r dim(accel_data)[2]` variables. Variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Variable "day" refers to the day the accelerometer was monitoring on. Variable "if_weekday" determines if the day is a weekday or weeekend. The rest of the "activity" columns represent the activity counts for each minute of a 24-hour day starting at midnight. A total of 1440 minutes of activity data was included.
+The tidied "accel_data" dataset contains `r dim(accel_data_min)[1]` observations and `r dim(accel_data_min)[2]` variables. This continuous 5-week accelerometer data was collected for monitoring the physicial activity of a 63 year-old male with BMI 25 who was diagnosed with congestive heart failure (CHF). 
+
+Numeric variable "week" includes number 1-5, indicating the number of weeks this experiment was at. Factor variable "day" refers to the day the accelerometer was monitoring on over 5 weeks. Character variable "if_weekday" shows if the day is a weekday or weeekend. Numeric variable "minute" lists out each minute within each day over 5 weeks. Numeric variable "activity_counts" shows the physicial activity of this 63 year-old male on every minute over 5 weeks.
 
 # Section 3.2
 ```{r echo = FALSE}
@@ -306,7 +308,7 @@ accel_total = accel_data_act %>%
   )
 ```
 
-Table 3: Total activity in minutes for each day over 5 weeks
+Table 3: Total activity measured in minutes for the 63 year-old male with BMI 25 on each day over 5 weeks
 ```{r echo = FALSE}
 knitr::kable(accel_total)
 ```
@@ -314,7 +316,7 @@ knitr::kable(accel_total)
 # Section 3.3
 ```{r echo = FALSE}
 accel_time_course = accel_data_act %>% 
-  mutate(
+  mutate( #Sum up the activity count for each hour
     "1" = select(., activity_1:activity_60) %>% 
       rowSums(na.rm = TRUE),
     "2" = select(., activity_61:activity_120) %>% 
@@ -364,14 +366,71 @@ accel_time_course = accel_data_act %>%
     "24" = select(., activity_1381:activity_1440) %>% 
       rowSums(na.rm = TRUE)
   ) %>% 
-  subset(select = c(1, 3, 1445:1468)) %>%
-  arrange(week, day) %>% 
+  subset(select = c(1, 3, 1445:1468)) %>% #select needed variables
+  arrange(week,day) %>% 
   pivot_longer(
     3:26,
-    names_to = "Time_of_day_hr",
+    names_to = "time_of_day_hr",
     values_to = "activity_count"
+  ) %>% 
+  mutate(
+    time_of_day_hr = as.numeric(time_of_day_hr) #change to numeric for later plotting 
   )
+```
 
-# map
+```{r echo = FALSE}
+# Split time-course data into 5 individual weeks
+accel_week1 = accel_time_course[1:168,]
+accel_week2 = accel_time_course[169:336,]
+accel_week3 = accel_time_course[337:504,]
+accel_week4 = accel_time_course[505:672,]
+accel_week5 = accel_time_course[673:840,]
+
+```
+
+```{r echo = FALSE}
+# Add up all lines corresponding to each day of the week
+ggplot(accel_time_course, aes(x = time_of_day_hr, y = activity_count)) +
+  geom_line(data = accel_week1, aes(colour = day)) +
+  geom_line(data = accel_week2, aes(colour = day)) +
+  geom_line(data = accel_week3, aes(colour = day)) +
+  geom_line(data = accel_week4, aes(colour = day)) +
+  geom_line(data = accel_week5, aes(colour = day)) +
+  xlab("Time of day (hour)") + 
+  ylab("Activity counts") +
+  ggtitle("Figure 4a: Physical activity of the 63 year-old male with BMI 25 over 5 weeks") +
+  theme(title = element_text(size = 13),
+        axis.title = element_text(size = 14),
+        strip.text = element_text(size = 12),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        legend.key.size = unit(1, "cm")
+        )
+
+```
+
+```{r echo = FALSE}
+week_label = c(`1` = "week 1", 
+              `2` = "week 2", 
+              `3` = "week 3", 
+              `4` = "week 4", 
+              `5` = "week 5")
+
+accel_time_course %>% 
+  ggplot(aes(x = time_of_day_hr, y = activity_count)) +
+  geom_line(aes(color = day)) +
+  facet_grid(~week, 
+             labeller = as_labeller(week_label)) +
+  xlab("Time of day (hour)") +
+  ylab("Activity counts") +
+  ggtitle("Figure 4b: Figure 4a displayed with each week individually") +
+  theme(panel.spacing.x = unit(1, "lines"),
+        title = element_text(size = 13),
+        axis.title = element_text(size = 14),
+        strip.text = element_text(size = 14),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        legend.key.size = unit(1, "cm")
+  )
 ```
 
