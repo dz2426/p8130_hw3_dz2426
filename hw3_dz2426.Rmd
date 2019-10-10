@@ -255,7 +255,7 @@ NY_response %>%
 ## Problem 3
 # Section 3.1
 ```{r echo = FALSE}
-# Import dataset
+# Import and clean dataset without changing "activity_n" columns
 accel_data_act = read_csv("./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
@@ -268,6 +268,7 @@ accel_data_act = read_csv("./data/accel_data.csv") %>%
 ```
 
 ```{r echo = FALSE}
+# Tidy dataset by creating "minute" variable
 accel_data_min = read_csv("./data/accel_data.csv") %>% 
   janitor::clean_names() %>% 
   mutate(
@@ -312,6 +313,11 @@ Table 3: Total activity measured in minutes of a 63 year-old male with BMI 25 on
 ```{r echo = FALSE}
 knitr::kable(accel_total)
 ```
+
+Comments:
+
+Based on the table shown above, we could observe that the physical activity tends to increase during weekdays over the 5 weeks, and tends to decrease during weekends over the 5 weeks. This may indicate that this 63 year-old male was getting less active during weekends, while more active during weekdays.
+
 
 # Section 3.3
 ```{r echo = FALSE}
