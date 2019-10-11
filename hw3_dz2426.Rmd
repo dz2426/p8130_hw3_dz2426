@@ -167,7 +167,7 @@ locations2002_df =
   filter(year == 2002) %>% 
   count(state) %>% 
   mutate(
-    n_of_locations = n/4 #After observing dataset, I notice there are 4 responses for each location. Thus, the number of each distinct locations equals the total number of observations divded by 4
+    n_of_locations = n/5 #After observing dataset, I notice there are 5 responses for each location. Thus, the number of each distinct locations equals the total number of observations divded by 5
   ) %>% 
   filter(n_of_locations > 6) 
 
@@ -176,7 +176,7 @@ locations2010_df =
   filter(year == 2010) %>% 
   count(state) %>% 
   mutate(
-    n_of_locations = n/4 
+    n_of_locations = n/5 
   ) %>% 
   filter(n_of_locations > 6) 
 ```
